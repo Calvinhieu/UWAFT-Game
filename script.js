@@ -1,9 +1,9 @@
-update = function() {
-    console.log("uodpatea lol");
+function update() {
+    
 }
 
-draw = function() {
-    console.log("draw");
+function draw() {
+    
 }
 
 $(document).ready(function() {
