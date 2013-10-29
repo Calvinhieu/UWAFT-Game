@@ -2,15 +2,40 @@ var c; //canvas
 var car; //car object
 var ctx; //context (to draw)
 var FPS; //FPS value
+var delta; //delta time between frames
+var current; //ms elapsed of current frame
+var previous; //ms elapsed of last frame
 var left; //left key boolean
 var right; //right key boolean
 
 Car = function() { //Car object
     this.x = 240; //xpos
     this.y = 600; //ypos
+    this.width = 60; //width
+    this.height = 100; //height
+    this.xspeed = 250; //xspeed
+    this.yspeed = 2; //yspeed
     img = new Image; //car image
     img.src = "car.png"; //car source
 };
+
+function moveCar () { //update car position
+    if(car.x >= 0) {
+        if(left) car.x-=car.xspeed*delta; //move left
+    }
+    if(car.x <= 500-car.width) {
+        if (right) car.x+=car.xspeed*delta; //move right
+    }
+    if (car.y > 500) {
+        car.y-=car.yspeed; //update car's vertical
+    }
+}
+
+function setDelta () {
+    current = Date.now(); //ms at current time
+    delta = (current-previous)/1000; //seconds since last frame
+    previous = Date.now(); //ms at current time
+}
 
 function keyInput () { //keyboard input function
     document.addEventListener('keydown', function(event) {//add listener (KEYDOWN)
@@ -33,8 +58,8 @@ function keyInput () { //keyboard input function
 
 function update() { //update method
     keyInput(); //check for keyboard input
-    if(left) car.x-=2;
-    else if (right) car.x+=2;
+    setDelta(); //evaluate time (ms) from last frame
+    moveCar(); //update car position
 }
 
 function draw() { //draw method
@@ -47,6 +72,7 @@ $(document).ready(function() { //document loaded
 	FPS=60; //set to 60fr/sec
     left = false; //left boolean to false
     right = false; //right boolean to true
+    previous = 0;
 
     c = document.getElementById("canvas"); //init canvas var
     car = new Car(); //create car
