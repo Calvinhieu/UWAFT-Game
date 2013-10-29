@@ -1,0 +1,15 @@
+body {
+	text-align: center;
+}
+#car {
+	position:absolute;
+	top:0px;
+	left:0px;
+	content:url("car.png");
+}
+canvas {
+	border:2px solid black;
+	background-color:#222;
+	width:500px;
+	height:700px;
+}
