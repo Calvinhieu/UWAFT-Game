@@ -18,8 +18,9 @@ var road2; //road 2 (test)
 var lose; //lose boolean
 var batterySpawnTime; //for battery spawn rate
 var fuelSpawnTime; //for fuel spawn rate
-var minSpawnInterval; //minimum time between spawn intervals
-
+var batterySpawnInterval; //minimum time between battery spawn intervals
+var fuelSpawnInterval; //minimum time between fuel spawn intervals
+var distanceTravelled; //total distance travelled (to be implemented)
 
 Car = function() { //Car object
     this.x = 240; //xpos
@@ -116,7 +117,7 @@ function updateRoad () { //update road position
     if(road2.y >= c.height) road2.y=-c.height; //reset road to top
 }
 
-function updateBattery () { //move battery items (to be modified)
+function updateBattery () { //move battery items 
     if (battery) {
         battery.y+=car.yspeed*delta; //move
         if (battery.y > c.height) battery = null; //delete from memory
@@ -127,11 +128,15 @@ function updateBattery () { //move battery items (to be modified)
         }
     }
     else {
-        if (Math.random() < 0.01) spawnInstances();
+        if (Math.round((Date.now()-batterySpawnTime)/1000)%5 == 0) {
+            if (Math.random()<0.01) { 
+                spawnBattery();
+            }
+        }
     }
 }
 
-function updateFuel () { //move fuel items (to be modified)
+function updateFuel () { //move fuel items
     if (fuel) {
         fuel.y+=car.yspeed*delta; //move
         if (fuel.y > c.height) fuel = null; //delete from memory
@@ -141,16 +146,25 @@ function updateFuel () { //move fuel items (to be modified)
             fuel = null; //collision detection (delete from memory)
         }
     }
+    else {
+        if (Math.round((Date.now()-fuelSpawnTime)/1000)%7 == 0) {
+            if (Math.random()<0.01) { 
+                spawnFuel();
+            }
+        }
+    }
 }
 
 function spawnBattery () { //spawn new battery (to be obsolete)
     if (!battery) //if none... 
-        battery = new PickUpItem (Math.random()*(158-itemSize)+184,Math.random()*(c.height/2),'battery','Battery.png');//...create
+        battery = new PickUpItem (Math.random()*(158-itemSize)+184,-itemSize,'battery','Battery.png');//...create
+    batterySpawnTime = Date.now();
 }
 
 function spawnFuel () { //spawn new fuel (to be obsolete)
     if (!fuel) //if none...
-        fuel = new PickUpItem (Math.random()*(158-itemSize)+184,Math.random()*(c.height/2),'fuel','Fuel.png'); //...create
+        fuel = new PickUpItem (Math.random()*(158-itemSize)+184,-itemSize,'fuel','Fuel.png'); //...create
+    fuelSpawnTime = Date.now();
 }
 
 function setDelta () { //calculate time (ms) between frames
@@ -176,11 +190,6 @@ function keyInput () { //keyboard input function
             right = false;
         }
     });
-}
-
-function spawnInstances () {
-    spawnBattery(); //spawn battery pick-up items
-    spawnFuel(); //spawn fuel pick-up items
 }
 
 function updateInstances () {
@@ -226,6 +235,8 @@ $(document).ready(function() { //document loaded
     previous = Date.now(); //initially set "time since last frame" to 0
     itemSize = 20; //pick-up item size
     trigger = false; //for road animation
+    fuelSpawnTime = Date.now(); //initialize fuel spawn time counter
+    batterySpawnTime = Date.now(); //initialize battery spawn time counter
 
     c = document.getElementById("canvas"); //init canvas var
     c.width=500; //set canvas size
@@ -238,12 +249,11 @@ $(document).ready(function() { //document loaded
     fuelDisplay = new DisplayMeter (30,10,'fuel'); //inst display meter for car's fuel level
     batteryDisplay = new DisplayMeter (10,10,'battery'); //inst display meter for car's battery level
 
-    spawnInstances();
-    loop();
+    loop(); //begin game loop
 });
 
 function loop () {
-    requestAnimationFrame(loop);
+    requestAnimationFrame(loop); //recursively call game loop
     update(); //update 
     draw(); //draw
 }
